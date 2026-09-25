@@ -29,54 +29,6 @@ jobs:
         run: chmod +x gradlew
         working-directory: ./android
 
-            # === FIX: Completely rewrite BillingManager to ignore Google Play ===
-      - name: Force Unlock Premium and Strip Play Billing Dependencies
-        run: |
-          FILE_PATH=$(find . -name "BillingManager.kt")
-          if [ -f "$FILE_PATH" ]; then
-            echo "Rewriting BillingManager.kt..."
-            cat << 'EOF' > "$FILE_PATH"
-            package com.llmhub.llmhub.billing
-
-            import android.app.Activity
-            import android.content.Context
-            import android.util.Log
-            import kotlinx.coroutines.*
-            import kotlinx.coroutines.flow.*
-
-            class BillingManager(private val context: Context) {
-                companion object {
-                    const val PRODUCT_PREMIUM_LIFETIME = "premium_lifetime"
-                    private const val TAG = "BillingManager"
-                }
-
-                private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-                private val _isPremium = MutableStateFlow(true)
-                val isPremium: StateFlow<Boolean> = _isPremium.asStateFlow()
-
-                private val _productPrice = MutableStateFlow<String?>("$0.00")
-                val productPrice: StateFlow<String?> = _productPrice.asStateFlow()
-
-                init {
-                    Log.d(TAG, "DUMMY_BILLING: Premium forced to true. Play services bypassed.")
-                }
-
-                fun connectAndQuery() {}
-                suspend fun queryProductDetails() {}
-                suspend fun restorePurchases() {}
-                suspend fun restorePurchasesFromServer(): Boolean { return true }
-                private suspend fun restorePurchasesInternal() {}
-                fun launchPurchaseFlow(activity: Activity) {}
-                private suspend fun handlePurchase(purchase: Any) {}
-                private suspend fun acknowledgeIfNeeded(purchase: Any) {}
-                private suspend fun setPremium(premium: Boolean) {}
-                fun destroy() { scope.cancel() }
-            }
-            EOF
-          else
-            echo "Error: Could not locate BillingManager.kt!" && exit 1
-          fi
-
 
       - name: Build Debug APK with Memory Limits
         run: ./gradlew assembleDebug -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=512m" --no-daemon
