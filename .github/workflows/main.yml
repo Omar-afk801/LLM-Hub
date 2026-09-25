@@ -29,6 +29,11 @@ jobs:
         run: chmod +x gradlew
         working-directory: ./android
 
+      # === NEW STEP ADDED HERE ===
+      - name: Inject Unlocked Premium Flag
+        run: echo "DEBUG_PREMIUM=true" > local.properties
+        working-directory: ./android
+
       - name: Build Debug APK with Memory Limits
         run: ./gradlew assembleDebug -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=512m" --no-daemon
         working-directory: ./android
@@ -44,3 +49,4 @@ jobs:
             Compiled securely via GitHub Actions.
           draft: false
           prerelease: false
+
