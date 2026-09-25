@@ -17,8 +17,9 @@ jobs:
           cache: 'gradle'
 
       - name: Accept Android Licenses
-        # This automatically types "y" to accept the NDK and SDK licenses required by the project
-        run: yes | sdkmanager --licenses || true
+        # This targets the absolute tool path in the GitHub Actions runner
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Grant Execute Permission to Gradle
         run: chmod +x gradlew
