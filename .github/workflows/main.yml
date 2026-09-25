@@ -29,10 +29,16 @@ jobs:
         run: chmod +x gradlew
         working-directory: ./android
 
-      # === NEW STEP ADDED HERE ===
-      - name: Inject Unlocked Premium Flag
-        run: echo "DEBUG_PREMIUM=true" > local.properties
-        working-directory: ./android
+      # === FIX: Hardcode the logic inside the code to always be true ===
+      - name: Force Unlock Premium in Source Code
+        run: |
+          FILE_PATH=$(find . -name "BillingManager.kt")
+          if [ -f "$FILE_PATH" ]; then
+            echo "Found BillingManager.kt at $FILE_PATH. Modifying flag..."
+            sed -i 's/if (BuildConfig.DEBUG_PREMIUM)/if (true)/g' "$FILE_PATH"
+          else
+            echo "Error: Could not locate BillingManager.kt automatically!" && exit 1
+          fi
 
       - name: Build Debug APK with Memory Limits
         run: ./gradlew assembleDebug -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=512m" --no-daemon
@@ -46,7 +52,8 @@ jobs:
           name: Release ${{ github.ref_name }}
           body: |
             Automated standalone universal APK release for ${{ github.ref_name }}.
-            Compiled securely via GitHub Actions.
+            Compiled securely via GitHub Actions with premium features unlocked.
           draft: false
           prerelease: false
+          
 
