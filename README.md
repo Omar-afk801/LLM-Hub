@@ -1,3 +1,7 @@
+**NOTE** **: this is a fork of LLM Hub made to restore premium features to free users, all credits go to the original developer, @timmyy123**
+
+
+
 # LLM Hub 🤖
 
 **LLM Hub** is an open-source mobile app for on-device LLM chat, image generation, video generation, and music generation, available for both **Android** and **iOS**. It's optimized for mobile usage (CPU/GPU/NPU acceleration) and supports multiple model formats so you can run powerful models locally and privately.
